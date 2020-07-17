@@ -6,9 +6,9 @@ module Patterns
 open System
 
 type Cell =
-| Pos
-| Neg 
-| Unk
+| Black
+| White 
+| Yellow
 
 type Pattern = 
 | BlackP
@@ -31,9 +31,9 @@ let _charToCell ch =
 
 let _cellToChar cell =
   match cell with 
-  | Pos -> Some 'b' 
-  | Neg -> Some 'w'
-  | Unk -> Some '.'
+  | Black -> Some 'b' 
+  | White -> Some 'w'
+  | Yellow -> Some '.'
   | _ -> None 
 
 let toCells (str:string) =
@@ -48,16 +48,16 @@ let toCells (str:string) =
 let fromCells (cells: Cell List) = 
   List.map _cellToChar cells
 
-//let Cwnt n p d =
-//    match (List.filter(p) d).Length = n with 
-//    |true -> Some //
-//    | _ -> None 
+let cwnt n p d =
+    match (List.filter(p) d).Length < n with 
+    |true -> Some //
+    | _ -> None   
 
 let p2Cell (ptn: Pattern) =
     match ptn with
-    | BlackP -> Pos
-    | WhiteP -> Neg
-    | UnknownP -> Unk
+    | BlackP -> Black
+    | WhiteP -> White
+    | UnknownP -> Yellow
     | _ -> failwith "Not implemented"
 
 
@@ -69,15 +69,17 @@ let exactlyMatch num ptn cells =
     | true -> None
     | _ -> Some out
 
-let patternMatch (ptn: Pattern) (d: Cell list): Option<Cell list>=
-    match ptn with
-     |BlackP -> // Some 'b'
-     |WhiteP ->  // some 'w'
-     |UnknownP ->  // some '.'
-     |ZeroOrMore a -> // patternMatch a d [agreed]
-     |OneOrMore a -> // patternMatch a d 
-     |Exactly (n, p) -> exactlyMatch n p d  
-     |FewerThan (n, p) ->
+let patternMatch (p: Pattern) (d: Cell list): Option<Cell list>=
+    let rec helper (p: Pattern) (d: Cell list) (r: Option<Cell list>) =
+         match p with
+         |BlackP -> r@[Some Black] // Some 'b'
+         |WhiteP -> r@[Some White] // some 'w'
+         |UnknownP -> r@[Some Yellow] // some '.'
+         |ZeroOrMore a -> helper a d r
+         |OneOrMore a -> helper a d r
+         |Exactly (n, p) -> exactlyMatch n p d  
+         |FewerThan (n, p) -> cwnt n p d 
+    helper p d r
 
  // toCells "bbw_B!W"
 
@@ -85,16 +87,6 @@ let patternMatch (ptn: Pattern) (d: Cell list): Option<Cell list>=
 //                                                                                                                                                                                        |> fromCells
 
 #endif
-
-let toCells v = failwith "Not implemented"
-
-let fromCells v = failwith "Not implemented" 
-
-let patternMatch pattern cells = failwith "Not implemented"
-
-let find pattern cells = failwith "Not implemented"
-
-let map func pattern cells = failwith "Not implemented"
 
 let toCells v = failwith "Not implemented"
 
