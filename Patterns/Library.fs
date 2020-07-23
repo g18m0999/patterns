@@ -176,25 +176,27 @@ let Map (func:Func) (ptn:Pattern) (lst:Cell list) =
      |Double -> let x = (ToCell ptn) >> x::lst
      | _ -> failwith "Not implemented"
 
-let Map (func:Cell list->Cell list) (ptn:Pattern) (lst:Cell list) =
-      
-    let z = patternMatch ptn lst
-    let fnlst = List.filter (fun x -> not((ToCell ptn) = x )) lst
-    let x = 0
-    let a = func z.Value 
-    let num = lst.Length
-    
-    let rec maker lst alst = 
-        match lst with
-        |t::rest  -> maker rest (alst@[t+1])   
-        |[] -> []
+let Find (ptn: Pattern) (lst: Cell list) = // failwith "Not implemented"
+  let rec count (cells:Cell list) counter =
+      match cells.Length > 0 with
+      | false -> None
+      | true -> 
+          match (patternMatch ptn cells) with
+          | None -> count cells.Tail (counter+1)
+          | Some ans -> Some (ans, counter)
+  count lst 0
 
-    match func with 
-        |makeUnknown -> maker lst []
-        |makeWhite -> 
-        |Delete -> fnlst
-        |Double -> z::lst
-        | _ -> failwith "Not implemented"
+  let rec maker lst alst = 
+      match lst with
+      |t::rest  -> maker rest (alst@[t+1])   
+      |[] -> []
+
+  match func with 
+      |makeUnknown -> maker lst []
+      |makeWhite -> 
+      |Delete -> fnlst
+      |Double -> z::lst
+      | _ -> failwith "Not implemented"
 
     
 (*
