@@ -175,16 +175,23 @@ let Map (func:Func) (ptn:Pattern) (lst:Cell list) =
      |Delete -> List.filter(fun x -> not((ToCell ptn) = x )lst
      |Double -> let x = (ToCell ptn) >> x::lst
      | _ -> failwith "Not implemented"
-let Map (func:Func) (ptn:Pattern) (lst:Cell list) =
-    let z = (ToCell ptn)
+
+let Map (func:Cell list->Cell list) (ptn:Pattern) (lst:Cell list) =
+      
+    let z = patternMatch ptn lst
     let fnlst = List.filter (fun x -> not((ToCell ptn) = x )) lst
     let x = 0
-    let maker ptn lst z = 
-        match lst.Length < x with
-        |true -> maker z::lst[x + 1]::[] 
-        |false -> []
+    let a = func z.Value 
+    let num = lst.Length
+    
+    let rec maker lst alst = 
+        match lst with
+        |t::rest  -> maker rest (alst@[t+1])   
+        |[] -> []
+
     match func with 
-        |MakeUnknown |MakeWhite |MakeBlack -> maker ptn lst z
+        |makeUnknown -> maker lst []
+        |makeWhite -> 
         |Delete -> fnlst
         |Double -> z::lst
         | _ -> failwith "Not implemented"
